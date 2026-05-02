@@ -5,15 +5,16 @@ Calculates glycemic index, glycemic load, sodium load, and other medical metrics
 from typing import Optional, Dict
 import numpy as np
 from dataclasses import dataclass
-from src.config import (
-    NutritionFacts, 
-    ClinicalMetrics, 
-    UserProfile, 
-    MEDICAL_THRESHOLDS,
-    GI_RANGES,
-    SODIUM_ALERTS,
-    SUGAR_ALERTS
-)
+try:
+    from food_label_analyzer.src.config import (
+        NutritionFacts, ClinicalMetrics, UserProfile,
+        MEDICAL_THRESHOLDS, GI_RANGES, SODIUM_ALERTS, SUGAR_ALERTS
+    )
+except ImportError:
+    from src.config import (
+        NutritionFacts, ClinicalMetrics, UserProfile,
+        MEDICAL_THRESHOLDS, GI_RANGES, SODIUM_ALERTS, SUGAR_ALERTS
+    )
 
 
 class GlycemicIndexCalculator:

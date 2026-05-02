@@ -6,12 +6,14 @@ from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timedelta
 from dataclasses import field, asdict
 from collections import defaultdict
-from src.config import (
-    ComplianceReport,
-    FoodItem,
-    UserProfile,
-    MealSimulationResult,
-)
+try:
+    from food_label_analyzer.src.config import (
+        ComplianceReport, FoodItem, UserProfile, MealSimulationResult,
+    )
+except ImportError:
+    from src.config import (
+        ComplianceReport, FoodItem, UserProfile, MealSimulationResult,
+    )
 
 
 class DailyConsumptionTracker:

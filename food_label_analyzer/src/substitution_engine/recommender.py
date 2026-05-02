@@ -4,12 +4,14 @@ Substitution Engine - Recommends healthier food alternatives
 from typing import List, Dict, Optional, Tuple
 from dataclasses import field
 import math
-from src.config import (
-    FoodItem,
-    SubstitutionRecommendation,
-    UserProfile,
-    FoodClassification,
-)
+try:
+    from food_label_analyzer.src.config import (
+        FoodItem, SubstitutionRecommendation, UserProfile, FoodClassification,
+    )
+except ImportError:
+    from src.config import (
+        FoodItem, SubstitutionRecommendation, UserProfile, FoodClassification,
+    )
 
 
 class NutrientSimilarityMatcher:

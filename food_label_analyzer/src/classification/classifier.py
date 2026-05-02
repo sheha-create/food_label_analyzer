@@ -3,18 +3,18 @@ Food Classification Engine
 Classifies foods as Suitable, Moderate, or Avoid based on medical thresholds and user profiles
 """
 from typing import Tuple, List, Dict, Optional
-from src.config import (
-    FoodClassification,
-    DiabetesType,
-    HypertensionSeverity,
-    NutritionFacts,
-    ClinicalMetrics,
-    UserProfile,
-    FoodItem,
-    SODIUM_ALERTS,
-    SUGAR_ALERTS,
-    GI_RANGES,
-)
+try:
+    from food_label_analyzer.src.config import (
+        FoodClassification, DiabetesType, HypertensionSeverity,
+        NutritionFacts, ClinicalMetrics, UserProfile, FoodItem,
+        SODIUM_ALERTS, SUGAR_ALERTS, GI_RANGES,
+    )
+except ImportError:
+    from src.config import (
+        FoodClassification, DiabetesType, HypertensionSeverity,
+        NutritionFacts, ClinicalMetrics, UserProfile, FoodItem,
+        SODIUM_ALERTS, SUGAR_ALERTS, GI_RANGES,
+    )
 
 
 class FoodClassifier:

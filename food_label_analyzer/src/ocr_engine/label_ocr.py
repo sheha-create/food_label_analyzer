@@ -9,7 +9,10 @@ import easyocr
 from typing import Dict, Tuple, Optional, List
 import re
 from dataclasses import dataclass
-from src.config import NutritionFacts, IngredientsList
+try:
+    from food_label_analyzer.src.config import NutritionFacts, IngredientsList
+except ImportError:
+    from src.config import NutritionFacts, IngredientsList
 
 @dataclass
 class OCRResult:
@@ -55,16 +58,22 @@ class NutritionLabelOCR:
         Returns:
             Preprocessed image as numpy array
         """
-        # Read image
+        # Read image — try OpenCV first, fall back to PIL for formats like TIFF/WebP
         img = cv2.imread(image_path)
         if img is None:
-            raise ValueError(f"Cannot read image: {image_path}")
+            try:
+                pil_img = Image.open(image_path).convert("RGB")
+                img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+            except Exception:
+                raise ValueError(f"Cannot read image: {image_path}")
         
         # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
-        # Apply thresholding
-        _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
+        # Adaptive thresholding works better than fixed threshold for varied lighting
+        thresh = cv2.adaptiveThreshold(
+            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+        )
         
         # Denoise
         denoised = cv2.fastNlMeansDenoising(thresh, None, h=10, templateWindowSize=7, searchWindowSize=21)
@@ -210,18 +219,19 @@ class NutritionFactsParser:
     """Parse standardized nutrition facts from OCR text"""
     
     def __init__(self):
+        # Keys must match NutritionFacts dataclass field names exactly
         self.nutrition_keywords = {
             'calories': ['calorie', 'kcal', 'energy', 'cal', 'كالوري'],
-            'total_fat': ['total fat', 'fat', 'वसा'],
-            'saturated_fat': ['saturated fat', 'saturated', 'संतृप्त'],
-            'trans_fat': ['trans fat', 'trans', 'ट्रांस'],
-            'cholesterol': ['cholesterol', 'कोलेस्ट्रॉल'],
-            'sodium': ['sodium', 'salt', 'na', 'सोडियम'],
-            'total_carbs': ['total carbohydrate', 'total carb', 'carb', 'carbohydrate', 'कार्बोहाइड्रेट'],
-            'fiber': ['dietary fiber', 'fiber', 'fibre', 'फाइबर'],
-            'sugars': ['total sugars', 'sugar content', 'sugars', 'sugar', 'शर्करा'],
-            'added_sugars': ['added sugars', 'added sugar', 'जोड़ा गया शर्करा'],
-            'protein': ['protein', 'प्रोटीन'],
+            'total_fat_g': ['total fat', 'fat', 'वसा'],
+            'saturated_fat_g': ['saturated fat', 'saturated', 'संतृप्त'],
+            'trans_fat_g': ['trans fat', 'trans', 'ट्रांस'],
+            'cholesterol_mg': ['cholesterol', 'कोलेस्ट्रॉल'],
+            'sodium_mg': ['sodium', 'salt', 'na', 'सोडियम'],
+            'total_carbs_g': ['total carbohydrate', 'total carb', 'carb', 'carbohydrate', 'कार्बोहाइड्रेट'],
+            'dietary_fiber_g': ['dietary fiber', 'fiber', 'fibre', 'फाइबर'],
+            'sugars_g': ['total sugars', 'sugar content', 'sugars', 'sugar', 'शर्करा'],
+            'added_sugars_g': ['added sugars', 'added sugar', 'जोड़ा गया शर्करा'],
+            'protein_g': ['protein', 'प्रोटीन'],
         }
     
     def parse_nutrition_facts(self, ocr_text: str) -> NutritionFacts:
@@ -255,8 +265,9 @@ class NutritionFactsParser:
             
             # Extract nutrients with flexible regex patterns
             for nutrient_name, keywords in self.nutrition_keywords.items():
-                if getattr(nutrition, nutrient_name, None) is not None:
-                    # Skip if already found
+                current_val = getattr(nutrition, nutrient_name, None)
+                if current_val is not None and current_val != 0.0:
+                    # Skip if already found with a real value
                     continue
                     
                 for keyword in keywords:
@@ -308,7 +319,10 @@ class NutritionFactsParser:
         ingredients_list.ingredients = ingredient_items
         
         # Detect sugar indicators
-        from src.config import HIDDEN_SUGAR_KEYWORDS, HIGH_SODIUM_KEYWORDS
+        try:
+            from food_label_analyzer.src.config import HIDDEN_SUGAR_KEYWORDS, HIGH_SODIUM_KEYWORDS
+        except ImportError:
+            from src.config import HIDDEN_SUGAR_KEYWORDS, HIGH_SODIUM_KEYWORDS
         
         for ingredient in ingredient_items:
             ingredient_lower = ingredient.lower()

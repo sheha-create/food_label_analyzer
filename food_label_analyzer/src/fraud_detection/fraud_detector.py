@@ -4,12 +4,14 @@ Identifies deceptive serving sizes, unrealistic nutrition claims, and food fraud
 """
 from typing import Dict, List, Optional, Tuple
 from dataclasses import field
-from src.config import (
-    NutritionFacts,
-    IngredientsList,
-    FraudDetectionResult,
-    FoodItem,
-)
+try:
+    from food_label_analyzer.src.config import (
+        NutritionFacts, IngredientsList, FraudDetectionResult, FoodItem,
+    )
+except ImportError:
+    from src.config import (
+        NutritionFacts, IngredientsList, FraudDetectionResult, FoodItem,
+    )
 
 
 class NutritionMarketDatabase:

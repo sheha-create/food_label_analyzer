@@ -5,16 +5,16 @@ Evaluates multi-food consumption impact and meal planning
 from typing import List, Dict, Optional
 from dataclasses import field
 from datetime import datetime
-from src.config import (
-    FoodItem,
-    MealSimulationResult,
-    UserProfile,
-    FoodClassification,
-    MEDICAL_THRESHOLDS,
-    GI_RANGES,
-    SODIUM_ALERTS,
-    SUGAR_ALERTS,
-)
+try:
+    from food_label_analyzer.src.config import (
+        FoodItem, MealSimulationResult, UserProfile, FoodClassification,
+        MEDICAL_THRESHOLDS, GI_RANGES, SODIUM_ALERTS, SUGAR_ALERTS,
+    )
+except ImportError:
+    from src.config import (
+        FoodItem, MealSimulationResult, UserProfile, FoodClassification,
+        MEDICAL_THRESHOLDS, GI_RANGES, SODIUM_ALERTS, SUGAR_ALERTS,
+    )
 
 
 class MealSimulator:

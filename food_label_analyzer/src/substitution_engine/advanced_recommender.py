@@ -7,8 +7,12 @@ from dataclasses import dataclass
 import numpy as np
 from pathlib import Path
 
-from src.config import UserProfile, UserGoal, DietaryPreference
-from src.data_loader import FoodData, get_data_loader
+try:
+    from food_label_analyzer.src.config import UserProfile, UserGoal, DietaryPreference
+    from food_label_analyzer.src.data_loader import FoodData, get_data_loader
+except ImportError:
+    from src.config import UserProfile, UserGoal, DietaryPreference
+    from src.data_loader import FoodData, get_data_loader
 
 
 @dataclass

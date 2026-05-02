@@ -6,9 +6,14 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 from enum import Enum
 
-from src.config import UserProfile
-from src.data_loader import FoodData, get_data_loader
-from src.substitution_engine.advanced_recommender import AdvancedSubstitutionEngine, SubstituteScore
+try:
+    from food_label_analyzer.src.config import UserProfile
+    from food_label_analyzer.src.data_loader import FoodData, get_data_loader
+    from food_label_analyzer.src.substitution_engine.advanced_recommender import AdvancedSubstitutionEngine, SubstituteScore
+except ImportError:
+    from src.config import UserProfile
+    from src.data_loader import FoodData, get_data_loader
+    from src.substitution_engine.advanced_recommender import AdvancedSubstitutionEngine, SubstituteScore
 
 
 class MealType(Enum):
