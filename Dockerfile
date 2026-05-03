@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender1 \
     libgomp1 \
-    libgl1-mesa-glx \
+    libgl1 \
     wget \
     tesseract-ocr \
     tesseract-ocr-eng \
