@@ -8,6 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
+    g++ \
+    cmake \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -27,7 +29,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install deps — no-cache keeps image small
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
 
 # Pre-download EasyOCR models (optional, kept for compatibility)

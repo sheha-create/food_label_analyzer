@@ -11,7 +11,7 @@ easyocr==1.7.2
 pytesseract==0.3.10
 scikit-image==0.22.0
 python-bidi==0.4.2
-pyclipper==1.3.0
+pyclipper
 Shapely==2.0.2
 
 # Web Framework
