@@ -1,0 +1,16 @@
+.git
+.gitignore
+.vscode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+venv
+.venv
+env
+*.log
+food_label_analyzer/__pycache__
+food_label_analyzer/data/__pycache__
+food_label_analyzer/src/__pycache__
+food_label_analyzer/tests/__pycache__

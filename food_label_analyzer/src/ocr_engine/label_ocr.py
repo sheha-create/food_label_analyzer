@@ -35,12 +35,23 @@ class NutritionLabelOCR:
             use_tesseract: Use Tesseract (faster)
         """
         self.use_easyocr = use_easyocr
-        self.use_tesseract = False
+        self.use_tesseract = use_tesseract
         
         if self.use_easyocr:
-            if NutritionLabelOCR._shared_reader is None:
-                NutritionLabelOCR._shared_reader = easyocr.Reader(['en', 'hi'])  
-            self.reader = NutritionLabelOCR._shared_reader  # English and Hindi
+            try:
+                if NutritionLabelOCR._shared_reader is None:
+                    import easyocr
+                    NutritionLabelOCR._shared_reader = easyocr.Reader(['en', 'hi'], gpu=False)
+                self.reader = NutritionLabelOCR._shared_reader
+            except Exception as e:
+                print(f"EasyOCR initialization failed: {e}. Falling back to Tesseract.")
+                self.use_easyocr = False
+                self.use_tesseract = True
+        
+        if self.use_tesseract:
+            import pytesseract
+            # Check if tesseract is in path, or configure if needed
+            # pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
         
         self.accuracy_metrics = {
             'ocr_attempts': 0,
@@ -110,13 +121,14 @@ class NutritionLabelOCR:
     def extract_text_tesseract(self, image_path: str) -> Tuple[str, float]:
         """Extract text using Tesseract - gracefully skip if not installed"""
         try:
+            import pytesseract
             processed_img = self.preprocess_image(image_path)
             
             # Convert to PIL Image
             img_pil = Image.fromarray(processed_img)
             
-            # Extract text
-            raw_text = pytesseract.image_to_string(img_pil)
+            # Extract text (English and Hindi)
+            raw_text = pytesseract.image_to_string(img_pil, lang='eng+hin')
             
             # Get confidence scores
             data = pytesseract.image_to_data(img_pil, output_type=pytesseract.Output.DICT)
@@ -148,7 +160,16 @@ class NutritionLabelOCR:
             try:
                 raw_text, confidence = self.extract_text_easyocr(image_path)
             except Exception as e:
-                print(f"EasyOCR failed: {e}")
+                print(f"EasyOCR failed: {e}. Trying Tesseract...")
+                self.use_easyocr = False
+                self.use_tesseract = True
+        
+        # Try Tesseract if EasyOCR is disabled or failed
+        if not raw_text and self.use_tesseract:
+            try:
+                raw_text, confidence = self.extract_text_tesseract(image_path)
+            except Exception as e:
+                print(f"Tesseract failed: {e}")
         
         if False:
             pass

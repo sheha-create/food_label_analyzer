@@ -309,6 +309,8 @@ st.sidebar.markdown("""
 page = st.sidebar.radio("", ["Home", "Analyze Label", "Substitutions", "Meal Substitutions", "Meal Simulator", "Weekly Report"])
 
 st.sidebar.markdown("<hr class='teal-divider'>", unsafe_allow_html=True)
+ocr_mode = st.sidebar.radio("OCR ENGINE", ["Standard (EasyOCR)", "Lite (Tesseract)"], index=0)
+st.sidebar.info("💡 Use 'Lite' mode if deployment memory is limited.")
 st.sidebar.markdown("""
 <div style='font-family:Space Mono,monospace; font-size:10px; color:#4a7a9b; line-height:1.8;'>
   <div style='color:#00d4aa; font-size:11px; margin-bottom:6px;'>● SYSTEM STATUS</div>
@@ -659,7 +661,9 @@ if page == "Analyze Label":
         else:
             with st.spinner("⏳ Extracting nutrition information from label..."):
                 try:
-                    ocr = ocr_cls()
+                    use_easyocr = (ocr_mode == "Standard (EasyOCR)")
+                    use_tesseract = (ocr_mode == "Lite (Tesseract)")
+                    ocr = ocr_cls(use_easyocr=use_easyocr, use_tesseract=use_tesseract)
                     ocr_result = ocr.extract_from_label(tpath)
                     st.success("✓ OCR extraction completed!")
 
